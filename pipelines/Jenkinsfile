@@ -1,0 +1,43 @@
+pipeline {
+    agent {
+        dockerfile {
+            dir 'pipelines'
+        }
+    }
+    environment {
+        // PANOS_API_KEY= credentials('panorama360_api_key')
+        // PANOS_HOSTNAME="10.1.3.4"
+        // ADMIN_PASSWORD = credentials('palo_admin_password')
+        ARM_SUBSCRIPTION_ID="8b308087-ea81-4958-b3be-c9360a994c53"
+        ARM_CLIENT_ID="d54f9753-23f0-4201-94cf-ee6404446bee"
+        ARM_CLIENT_SECRET=credentials('SPtest_NetSec_CLIENT_SECRET')
+        ARM_TENANT_ID="ee8a5a7e-abe8-4834-9fdb-6161509f0ec4"
+    }
+    
+    stages {
+        stage('Terraform Plan') {        
+            steps{ 
+                ansiColor('xterm') {
+                    sh  """   
+                    terraform init -input=false
+                    terraform plan -out tfplan -input=false
+                    """
+                } 
+            }
+       }   
+    }
+
+    post {
+    success {
+      mail to: "iromaniuk@advisor360.com", 
+      subject:"SUCCESS: ${currentBuild.fullDisplayName}", 
+      body: "The pipeline ${currentBuild.fullDisplayName} completed successfully."
+    }
+    failure {
+      mail to: "iromaniuk@advisor360.com", 
+      subject:"FAILURE: ${currentBuild.fullDisplayName}", 
+      body: "Something is wrong with ${env.BUILD_URL} #${env.BUILD_NUMBER} #${env.JOB_NAME}"
+    }
+    
+  }
+}    

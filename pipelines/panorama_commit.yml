@@ -1,0 +1,16 @@
+---
+- hosts: localhost
+  connection: local
+  gather_facts: "yes"
+  vars:
+    # ansible_python_interpreter: /usr/local/bin/python
+  tasks:    
+    # - name: Print all available facts
+    #   ansible.builtin.debug:
+    #     var: ansible_facts 
+    - name: commit candidate configs on panorama
+      # https://paloaltonetworks.github.io/pan-os-ansible/modules.html
+      paloaltonetworks.panos.panos_commit_panorama:
+        provider: 
+          ip_address: '{{ip_address}}'
+          api_key: '{{api_key}}'
